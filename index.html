@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Prediction Wizard</title>
+    <link rel="stylesheet" href="static/d3.slider.css" />
+    <style>
+
+    body {
+       font-family: Verdana,Arial,sans-serif;
+
+       /* background image */
+       background-image: url("https://weplay.co/wp-content/uploads/2016/08/8.jpg");
+		/* Full height */
+		height: 100%;
+
+	    /* Center and scale the image nicely */
+	    background-size: cover;
+	    background-repeat: no-repeat;
+	    
+    }
+
+     
+
+     h2 {
+       font-size: 1.0em;
+       margin: 35px 0 5px 0;
+       color: #E3E2E2
+     }
+
+     .space {
+       margin-bottom: 20 px;
+     }
+
+     .wrapper {
+     	width:500px;
+     	position: absolute;
+     	top: 50px;
+     	right: 25px;
+      
+     }
+
+     .results{
+     	position: absolute;
+     	left: 15px;
+     	bottom: 100px;
+     	font-size:20px;
+     }
+
+     .topright{
+     	position: absolute;
+     	top: 8px;
+     	right: 70px;
+     	font-size:15px;
+		color: #E3E2E2; 
+
+     
+     }
+
+     #bar_chart {
+       margin-bottom: 0 px;
+     }
+
+     .bar {
+       fill: #FF75A3;
+     }
+
+     .team_sect_h {
+     	font-size:30px;
+     	color: #e90052;
+
+     }
+
+     .team_sect_a {
+     	font-size:30px;
+     	color: #04f5ff;
+
+     }
+
+     span {
+       color: #00ff85;
+     }
+
+    </style>
+  
+</head>
+
+
+<body>
+	<font color="white">
+		<h1>European Football Predictor</h1>
+		<h5>Estimate match outcome based on home / away team attributes</h5>
+	</font>
+
+
+	<div id="chart_area" class="topright">
+      <h1>Select Each Team's Attributes</h1>
+      <p class="space"></p>
+      <div id="bar_chart"></div>
+    </div>
+
+    <div id="result_area" class="results">
+    	<h2 class='result_score'>Predicted Outcome: <span id="result_show">??</span></h2>
+    </div>
+
+    <div id="sliders" class="wrapper">
+
+    	<!-- HOME TEAM SECTION -->
+    	<div class='team_sect_h'>
+    		<p>Home Team</p>
+    	</div>
+    	
+
+      <h2 class="feature">Defence Pressure: <span id="home_defence">50.0</span></h2>
+      <div id="h_defence_pressure_slider"></div>
+
+      <h2 class="feature">Chance Creation Positioning Class: <span id="home_chance">
+        <select id="h-d3-dropdown">
+          <option value="0">Free Form</option>
+          <option value="1">Organised</option>
+        </select>
+      </span></h2>
+     
+
+      <h2 class="feature">Build Up Play Passing: <span id="home_build_up_passing">50.0</span></h2>
+      <div id="h_passing_slider"></div>
+
+
+
+
+      <!-- AWAY TEAM SECTION -->
+      <div class='team_sect_a'>
+    		<p>Away Team</p>
+    	</div>
+
+      <h2 class="feature">Defence Pressure: <span id="away_defence">50.0</span></h2>
+      <div id="a_defence_pressure_slider"></div>
+
+      <h2 class="feature">Chance Creation Positioning Class: <span id="away_chance">
+        <select id="a-d3-dropdown">
+          <option value="0">Free Form</option>
+          <option value="1">Organised</option>
+        </select>
+      </span></h2>
+
+      <h2 class="feature">Build Up Play Passing: <span id="away_build_up_passing">50.0</span></h2>
+      <div id="a_passing_slider"></div>
+
+    </div>
+
+    <!-- Import the libraries: jQuery, d3, d3.slider -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="static/d3.slider.js"></script>
+
+
+
+    <script>
+
+     <!-- SINGLE BAR CHART -->
+
+     var h_defence = 50;
+     var h_chance = 0;
+     var h_passing = 50;
+     var a_defence = 50;
+     var a_chance = 0;
+     var a_passing = 50;
+
+  
+
+     <!-- FUNCTION TO GET CHANCE FROM YOUR PREDICTOR WITH AJAX AND CHANGE BAR  HEIGHT -->
+     function getAndDrawChance(h_def, h_ch, h_pas,a_def,a_ch,a_pas){
+
+       
+       $.ajax({
+         type: "POST",
+         contentType: "application/json; charset=utf-8",
+         url: "/score",
+         dataType: "json",
+         async: true,
+         
+         data: "{\"example\": ["+h_def+","+a_def+","+h_pas+","+a_pas+","+h_ch+","+a_ch+"]}", 
+         
+         success: function (data) {
+           var chance = data["score"];
+           d3.select("#result_show").text(chance);
+
+           
+         },
+         error: function (result) {
+          d3.select("#result_show").text("error");
+         }
+       })
+     }
+
+
+     <!-- SLIDERS -->
+
+     <!-- HOME TEAM --> 
+     d3.select('#h_defence_pressure_slider')
+       .call(
+         d3.slider()
+           .value(h_defence)
+           .min(0)
+           .max(100)
+           .step(1)
+           .axis(true)
+           .on("slide", function(evt,value) {
+             d3.select('#home_defence').text(value);
+             h_defence = value;
+             getAndDrawChance(h_defence, h_chance, h_passing,a_defence,a_chance,a_passing)
+           }
+           )
+       );
+
+
+	d3.select('#h-d3-dropdown')
+	
+		.on('change',function(d){
+			var selected=d3.select('#h-d3-dropdown').node().value;
+			d3.select('#home_chance').text();
+      h_chance = selected;
+
+			getAndDrawChance(h_defence, h_chance, h_passing,a_defence,a_chance,a_passing)
+		}
+	);
+
+	 	
+     d3.select('#h_passing_slider')
+       .call(
+         d3.slider()
+           .value(h_passing)
+           .min(0)
+           .max(100)
+           .step(1)
+           .axis(true)
+           .on("slide", function(evt,value) {
+             d3.select('#home_build_up_passing').text(value);
+             h_passing = value;
+             getAndDrawChance(h_defence, h_chance, h_passing,a_defence,a_chance,a_passing)
+           }
+           )
+       );
+
+
+     <!-- AWAY TEAM --> 
+     d3.select('#a_defence_pressure_slider')
+       .call(
+         d3.slider()
+           .value(a_defence)
+           .min(0)
+           .max(100)
+           .step(1)
+           .axis(true)
+           .on("slide", function(evt,value) {
+             d3.select('#away_defence').text(value);
+             a_defence = value;
+             getAndDrawChance(h_defence, h_chance, h_passing,a_defence,a_chance,a_passing)
+           }
+           )
+       );
+
+
+	d3.select('#a-d3-dropdown')
+		
+		.on('change',function(d){
+			var selected=d3.select('#a-d3-dropdown').node().value;
+			d3.select('#away_chance').text();
+			a_chance = selected;
+			getAndDrawChance(h_defence, h_chance, h_passing,a_defence,a_chance,a_passing)
+		}
+	);
+
+	 d3.select('#a_passing_slider')
+       .call(
+         d3.slider()
+           .value(a_passing)
+           .min(0)
+           .max(100)
+           .step(1)
+           .axis(true)
+           .on("slide", function(evt,value) {
+             d3.select('#away_build_up_passing').text(value);
+             a_passing = value;
+             getAndDrawChance(h_defence, h_chance, h_passing,a_defence,a_chance,a_passing)
+           }
+           )
+       );
+     
+
+    </script>
+
+</body>
+</html>
