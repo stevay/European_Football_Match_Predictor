@@ -33,6 +33,6 @@ Using data from the web (API or scraped) or one of the optional supplied data se
 
 #### More information:
 
-Data sources for this project are all about options. We can choose from a number of [pre-selected](sql_data_sets.md) data sets. We can also use our own data (either scraped from the web or pulled from api's) or supplement the pre-selected data with some of our own. Either way, we will be honing our database skills by storing data in PostgreSQL and doing some of our analysis there.[^1]
+Data sources for this project are all about options. We can choose from a number of [pre-selected](sql_data_sets.md) data sets. We can also use our own data (either scraped from the web or pulled from api's) or supplement the pre-selected data with some of our own. Either way, we will be honing our database skills by storing data in PostgreSQL and doing some of our analysis there.
 
 We'll also learn about many supervised learning methods that can be used to predict outcomes for our projects. And we can showcase those results with a flask website or D3 visualization.
