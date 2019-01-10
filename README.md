@@ -11,7 +11,7 @@ Using data from the web (API or scraped) or one of the optional supplied data se
  * **acquisition**: download, api's, scraping, etc.
  * **storage**: PostgreSQL
  * **example sources**:  (see [sql_data_sets](sql_data_sets.md) for descriptions and links to data.)
-  - Sports, Sports, and More Sports!
+    - Sports, Sports, and More Sports!
 
 #### Required Skills & Tools
 
